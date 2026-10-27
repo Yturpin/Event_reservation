@@ -2,9 +2,16 @@
 
 Projet du cours **NoSQL Databases** (Efrei, M1), réalisé en équipe.
 
-Notre application permet aux utilisateurs de **rechercher et réserver des places** pour différents types d'événements (concerts, matchs, spectacles…). Elle permet aussi aux **organisateurs** de créer et gérer leurs événements.
+Notre application permet aux utilisateurs de **rechercher et réserver des places** pour différents **cas** : concerts, matchs, spectacles… Elle permet aussi aux **organisateurs** de créer et gérer leurs cas.
 
 L'application est découpée en **services indépendants**. Chaque service gère un seul métier et possède ses propres données. Les services se tiennent informés par des **événements** plutôt que par des appels directs, afin de rester autonomes quand l'un d'eux est indisponible.
+
+## Vocabulaire
+
+- **Cas** : ce que l'on réserve, c'est-à-dire un concert, un match, un spectacle…
+- **Événement** : un message qu'un service envoie aux autres pour annoncer un fait (par exemple `PlacesReservees`), au sens du cours.
+
+Nous avons choisi le mot « cas » pour ne jamais confondre ce que l'on réserve avec les événements échangés entre services.
 
 ## Équipe
 
@@ -18,42 +25,42 @@ L'application est découpée en **services indépendants**. Chaque service gère
 
 ## Les utilisateurs de l'application
 
-- **Participant** : cherche un événement, réserve des places, paie, puis laisse un avis après l'événement.
-- **Organisateur** : crée ses événements, modifie leurs informations (date, prix, nombre de places) ou les annule.
+- **Participant** : cherche un cas, réserve des places, paie, puis laisse un avis une fois le cas passé.
+- **Organisateur** : crée ses cas, modifie leurs informations (date, prix, nombre de places) ou les annule.
 
 ## Parcours principal
 
-1. Un organisateur crée un événement.
-2. Un participant consulte les événements et réserve des places.
+1. Un organisateur crée un cas.
+2. Un participant consulte les cas et réserve des places.
 3. Le participant paie sa réservation, qui est alors confirmée.
-4. Après l'événement, le participant laisse un avis.
+4. Une fois le cas passé, le participant laisse un avis.
 
 ## Les services
 
 | Service | Responsabilité | Données dont il est propriétaire |
 |---|---|---|
 | **Utilisateurs** | Inscription, profil, rôle (participant ou organisateur) | Les comptes utilisateurs |
-| **Événements** | Création, modification et annulation des événements par les organisateurs | Les événements (titre, date, lieu, catégorie, prix, capacité) |
+| **Cas** | Création, modification et annulation des cas par les organisateurs | Les cas (titre, catégorie, date, lieu, prix, capacité) |
 | **Réservations** | Réservation et annulation de places, suivi des places disponibles | Les réservations |
 | **Paiements** | Paiement d'une réservation, remboursement en cas d'annulation | Les paiements |
-| **Avis** | Notes et commentaires laissés par les participants après un événement | Les avis |
+| **Avis** | Notes et commentaires laissés par les participants après un cas | Les avis |
 
-Chaque service est le **seul** à pouvoir modifier ses données. Quand un service a besoin d'une information détenue par un autre (par exemple, Réservations a besoin du prix d'un événement), il en garde une **copie locale**, mise à jour par les événements que le service propriétaire publie.
+Chaque service est le **seul** à pouvoir modifier ses données. Quand un service a besoin d'une information détenue par un autre (par exemple, Réservations a besoin du prix d'un cas), il en garde une **copie locale**, mise à jour par les événements que le service propriétaire publie.
 
 ```mermaid
 flowchart LR
     U[Utilisateurs]
-    E[Événements]
+    E[Cas]
     R[Réservations]
     P[Paiements]
     A[Avis]
 
-    E -. informations de l'événement .-> R
+    E -. informations du cas .-> R
     U -. informations du participant .-> R
     R -. montant à payer .-> P
     P -. paiement accepté ou refusé .-> R
-    R -. qui a assisté à quel événement .-> A
-    E -. événement annulé .-> R
+    R -. qui a assisté à quel cas .-> A
+    E -. cas annulé .-> R
 ```
 
 _Les flèches indiquent quelles données circulent d'un service à l'autre. Les événements exacts seront définis à l'étape 4._
@@ -62,11 +69,11 @@ _Les flèches indiquent quelles données circulent d'un service à l'autre. Les 
 
 ### Les places disponibles sont gérées par Réservations
 
-Le service Événements définit la **capacité** d'un événement (le nombre total de places). Le service Réservations reçoit cette capacité et tient lui-même le compte des **places restantes**.
+Le service Cas définit la **capacité** d'un cas (le nombre total de places). Le service Réservations reçoit cette capacité et tient lui-même le compte des **places restantes**.
 
-Pourquoi : réserver des places consiste à vérifier qu'il en reste puis à les retirer. Si ces deux opérations se font dans le même service, elles se font en une seule fois, sans risque de vendre plus de places qu'il n'en existe. Si les places restantes étaient gérées par Événements, Réservations devrait le prévenir à chaque réservation, et deux réservations simultanées pourraient se croiser.
+Pourquoi : réserver des places consiste à vérifier qu'il en reste puis à les retirer. Si ces deux opérations se font dans le même service, elles se font en une seule fois, sans risque de vendre plus de places qu'il n'en existe. Si les places restantes étaient gérées par Cas, Réservations devrait le prévenir à chaque réservation, et deux réservations simultanées pourraient se croiser.
 
-Conséquence : si un organisateur modifie la capacité, Événements publie un événement que Réservations prend en compte pour recalculer les places restantes.
+Conséquence : si un organisateur modifie la capacité, le service Cas publie un événement que Réservations prend en compte pour recalculer les places restantes.
 
 ## Avancement
 
