@@ -1,0 +1,84 @@
+{
+  "service": "avis",
+  "description": "Gère les notes et commentaires laissés par les participants sur les cas auxquels ils ont assisté.",
+  "commandes": [
+    {
+      "nom": "PublierAvis",
+      "description": "Un participant publie un avis sur un cas auquel il a assisté.",
+      "donnees": {
+        "utilisateurId": "USR-12",
+        "casId": "CAS-7",
+        "note": 4,
+        "commentaire": "Super ambiance, son un peu fort."
+      },
+      "refuseeSi": [
+        "le participant n'a pas de réservation confirmée pour ce cas",
+        "le cas n'est pas encore passé, ou il a été annulé",
+        "le participant a déjà publié un avis sur ce cas",
+        "la note n'est pas un entier entre 1 et 5"
+      ],
+      "evenementsEmis": ["AvisPublie"]
+    },
+    {
+      "nom": "ModifierAvis",
+      "description": "L'auteur d'un avis modifie sa note ou son commentaire.",
+      "donnees": {
+        "avisId": "AVI-9",
+        "utilisateurId": "USR-12",
+        "note": 5,
+        "commentaire": "Finalement, meilleur concert de l'année."
+      },
+      "refuseeSi": [
+        "l'avis est inconnu ou supprimé",
+        "l'utilisateur n'est pas l'auteur de l'avis",
+        "la note n'est pas un entier entre 1 et 5"
+      ],
+      "evenementsEmis": ["AvisModifie"]
+    },
+    {
+      "nom": "SupprimerAvis",
+      "description": "L'auteur d'un avis le supprime.",
+      "donnees": {
+        "avisId": "AVI-9",
+        "utilisateurId": "USR-12"
+      },
+      "refuseeSi": [
+        "l'avis est inconnu ou déjà supprimé",
+        "l'utilisateur n'est pas l'auteur de l'avis"
+      ],
+      "evenementsEmis": ["AvisSupprime"]
+    }
+  ],
+  "reactions": [
+    {
+      "evenement": "CasCree",
+      "venantDe": "cas",
+      "action": "Enregistrer une copie du cas avec sa date, pour savoir s'il est passé.",
+      "evenementsEmis": []
+    },
+    {
+      "evenement": "CasModifie",
+      "venantDe": "cas",
+      "action": "Mettre à jour la date du cas dans la copie.",
+      "evenementsEmis": []
+    },
+    {
+      "evenement": "CasAnnule",
+      "venantDe": "cas",
+      "action": "Marquer le cas comme annulé dans la copie : plus aucun avis possible.",
+      "evenementsEmis": []
+    },
+    {
+      "evenement": "ReservationConfirmee",
+      "venantDe": "reservations",
+      "action": "Noter que ce participant a une place confirmée pour ce cas.",
+      "evenementsEmis": []
+    },
+    {
+      "evenement": "ReservationAnnulee",
+      "venantDe": "reservations",
+      "action": "Retirer ce participant de la liste des personnes autorisées à donner un avis sur ce cas.",
+      "evenementsEmis": []
+    }
+  ]
+}

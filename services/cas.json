@@ -1,0 +1,108 @@
+{
+  "service": "cas",
+  "description": "Gère les cas (concerts, matchs, spectacles) créés par les organisateurs : informations, prix, capacité et annulation.",
+  "commandes": [
+    {
+      "nom": "CreerCas",
+      "description": "Un organisateur crée un nouveau cas.",
+      "donnees": {
+        "organisateurId": "USR-3",
+        "titre": "Concert de rap",
+        "categorie": "CONCERT",
+        "date": "2026-12-12T20:00:00",
+        "lieu": "Zénith Paris",
+        "prixPlace": 45.0,
+        "capacite": 500
+      },
+      "refuseeSi": [
+        "l'utilisateur n'est pas un organisateur",
+        "la date est déjà passée",
+        "le prix est négatif",
+        "la capacité n'est pas un nombre entier supérieur à zéro",
+        "la catégorie n'est pas CONCERT, MATCH ou SPECTACLE"
+      ],
+      "evenementsEmis": ["CasCree"]
+    },
+    {
+      "nom": "ModifierCas",
+      "description": "L'organisateur modifie le titre, la date ou le lieu de son cas.",
+      "donnees": {
+        "casId": "CAS-7",
+        "organisateurId": "USR-3",
+        "titre": "Concert de rap",
+        "date": "2026-12-13T20:00:00",
+        "lieu": "Zénith Paris"
+      },
+      "refuseeSi": [
+        "l'utilisateur n'est pas l'organisateur de ce cas",
+        "le cas est annulé ou déjà passé",
+        "la nouvelle date est déjà passée"
+      ],
+      "evenementsEmis": ["CasModifie"]
+    },
+    {
+      "nom": "ModifierPrix",
+      "description": "L'organisateur change le prix d'une place. Le nouveau prix s'applique aux réservations suivantes, pas à celles déjà faites.",
+      "donnees": {
+        "casId": "CAS-7",
+        "organisateurId": "USR-3",
+        "prixPlace": 50.0
+      },
+      "refuseeSi": [
+        "l'utilisateur n'est pas l'organisateur de ce cas",
+        "le cas est annulé ou déjà passé",
+        "le prix est négatif"
+      ],
+      "evenementsEmis": ["PrixModifie"]
+    },
+    {
+      "nom": "ModifierCapacite",
+      "description": "L'organisateur change le nombre total de places de son cas.",
+      "donnees": {
+        "casId": "CAS-7",
+        "organisateurId": "USR-3",
+        "capacite": 600
+      },
+      "refuseeSi": [
+        "l'utilisateur n'est pas l'organisateur de ce cas",
+        "le cas est annulé ou déjà passé",
+        "la nouvelle capacité est inférieure au nombre de places déjà réservées"
+      ],
+      "evenementsEmis": ["CapaciteModifiee"]
+    },
+    {
+      "nom": "AnnulerCas",
+      "description": "L'organisateur annule son cas. Les réservations seront annulées et remboursées par les services concernés.",
+      "donnees": {
+        "casId": "CAS-7",
+        "organisateurId": "USR-3",
+        "motif": "Artiste malade"
+      },
+      "refuseeSi": [
+        "l'utilisateur n'est pas l'organisateur de ce cas",
+        "le cas est déjà annulé ou déjà passé"
+      ],
+      "evenementsEmis": ["CasAnnule"]
+    }
+  ],
+  "reactions": [
+    {
+      "evenement": "CompteCree",
+      "venantDe": "utilisateurs",
+      "action": "Si le compte est celui d'un organisateur, l'enregistrer dans la copie des organisateurs, pour vérifier les rôles sans appeler le service Utilisateurs.",
+      "evenementsEmis": []
+    },
+    {
+      "evenement": "PlacesReservees",
+      "venantDe": "reservations",
+      "action": "Augmenter le nombre de places réservées dans la copie tenue par Cas, pour pouvoir refuser une baisse de capacité en dessous de ce nombre.",
+      "evenementsEmis": []
+    },
+    {
+      "evenement": "ReservationAnnulee",
+      "venantDe": "reservations",
+      "action": "Diminuer le nombre de places réservées dans cette même copie.",
+      "evenementsEmis": []
+    }
+  ]
+}

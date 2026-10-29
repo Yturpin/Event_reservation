@@ -1,0 +1,49 @@
+{
+  "service": "utilisateurs",
+  "description": "Gère les comptes des utilisateurs et leur rôle : participant ou organisateur.",
+  "commandes": [
+    {
+      "nom": "CreerCompte",
+      "description": "Une personne s'inscrit sur l'application en tant que participant ou organisateur.",
+      "donnees": {
+        "nom": "Diallo",
+        "prenom": "Awa",
+        "email": "awa.diallo@mail.fr",
+        "role": "PARTICIPANT"
+      },
+      "refuseeSi": [
+        "l'adresse email est déjà utilisée par un autre compte",
+        "l'adresse email n'est pas valide",
+        "le rôle n'est ni PARTICIPANT ni ORGANISATEUR"
+      ],
+      "evenementsEmis": ["CompteCree"]
+    },
+    {
+      "nom": "ModifierProfil",
+      "description": "Un utilisateur modifie son nom, son prénom ou son adresse email.",
+      "donnees": {
+        "utilisateurId": "USR-12",
+        "nom": "Diallo",
+        "prenom": "Awa",
+        "email": "awa.d@mail.fr"
+      },
+      "refuseeSi": [
+        "le compte n'existe pas ou a été supprimé",
+        "la nouvelle adresse email est déjà utilisée par un autre compte"
+      ],
+      "evenementsEmis": ["ProfilModifie"]
+    },
+    {
+      "nom": "SupprimerCompte",
+      "description": "Un utilisateur supprime son compte.",
+      "donnees": {
+        "utilisateurId": "USR-12"
+      },
+      "refuseeSi": [
+        "le compte n'existe pas ou a déjà été supprimé"
+      ],
+      "evenementsEmis": ["CompteSupprime"]
+    }
+  ],
+  "reactions": []
+}

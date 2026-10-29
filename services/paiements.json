@@ -1,0 +1,36 @@
+{
+  "service": "paiements",
+  "description": "Gère le paiement des réservations et leur remboursement.",
+  "commandes": [
+    {
+      "nom": "PayerReservation",
+      "description": "Un participant paie sa réservation. Le montant n'est pas fourni par le participant : le service le lit dans sa copie de la réservation.",
+      "donnees": {
+        "reservationId": "RES-301",
+        "utilisateurId": "USR-12",
+        "moyenPaiement": "CARTE"
+      },
+      "refuseeSi": [
+        "la réservation est inconnue",
+        "la réservation n'appartient pas à cet utilisateur",
+        "la réservation n'est pas en attente de paiement (déjà payée ou annulée)",
+        "le moyen de paiement n'est pas accepté"
+      ],
+      "evenementsEmis": ["PaiementAccepte", "PaiementRefuse"]
+    }
+  ],
+  "reactions": [
+    {
+      "evenement": "PlacesReservees",
+      "venantDe": "reservations",
+      "action": "Enregistrer une copie de la réservation avec le montant à payer.",
+      "evenementsEmis": []
+    },
+    {
+      "evenement": "ReservationAnnulee",
+      "venantDe": "reservations",
+      "action": "Si la réservation avait été payée, rembourser le participant.",
+      "evenementsEmis": ["PaiementRembourse"]
+    }
+  ]
+}
