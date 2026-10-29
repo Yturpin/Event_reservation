@@ -21,7 +21,7 @@ Nous avons choisi le mot « cas » pour ne jamais confondre ce que l'on réserve
 | Klinger Julien | [@julienkl](https://github.com/julienkl) |
 | Aboulaith Laissad | [@Ragna2024](https://github.com/Ragna2024) |
 | JP Minko | [@Pierrewb02](https://github.com/Pierrewb02) |
-| Jasari Anissa | _à venir_ |
+| Jasari Anissa | [@a-jsr](https://github.com/a-jsr) |
 
 ## Les utilisateurs de l'application
 
@@ -75,12 +75,25 @@ Pourquoi : réserver des places consiste à vérifier qu'il en reste puis à les
 
 Conséquence : si un organisateur modifie la capacité, le service Cas publie un événement que Réservations prend en compte pour recalculer les places restantes.
 
+### Deux bases NoSQL : MongoDB et Redis
+
+| Base | Famille | Utilisée par | Pourquoi |
+|---|---|---|---|
+| **MongoDB** | Document | Utilisateurs, Cas, Paiements, Avis | Ces services lisent et écrivent leurs agrégats en entier, déjà décrits en JSON. Les recherches sont variées (cas par lieu, date ou prix, avis d'un cas triés par note). Le schéma souple permet d'ajouter de nouveaux types de cas (festivals sur plusieurs jours, places numérotées, plusieurs tarifs) sans tout restructurer. |
+| **Redis** | Clé-valeur | Réservations, et le transport des événements | Le moment critique d'une billetterie est l'ouverture des ventes, quand beaucoup de participants veulent les mêmes places en même temps. Redis retire les places en une seule opération atomique, ce qui empêche de vendre plus de places qu'il n'en existe. Ses listes servent aussi à faire circuler les événements entre services. |
+
+Redis garde ses données en mémoire : sa persistance sur disque (AOF) sera activée pour ne pas perdre de réservation en cas de redémarrage.
+
+### Ce qui est programmé
+
+Les cinq services sont conçus en JSON. **Cas** et **Réservations** sont programmés : Cas publie ses événements, Réservations les reçoit et met à jour sa copie du cas. Les trois autres services ont leurs bases remplies et interrogeables. Les bases tournent avec Docker.
+
 ## Avancement
 
 | Étape | Contenu | État |
 |---|---|---|
 | 1 | Équipe, dépôt, descriptif du projet | ✅ |
-| 2 | Services et commandes associées, en JSON | ⏳ |
+| 2 | Services et commandes associées, en JSON | ⏳ 4 services sur 5 |
 | 3 | Agrégats de chaque service, en JSON | ⏳ |
 | 4 | Événements entre services et agrégats répliqués, en JSON | ⏳ |
 | 6 | Projection des données vers un nouveau service | ⏳ |
